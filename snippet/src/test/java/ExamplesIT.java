@@ -3,11 +3,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
-import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
-import com.google.common.io.Files;
-import com.google.common.io.InputSupplier;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,6 +37,11 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
+import com.google.common.io.Files;
+import com.google.common.io.InputSupplier;
+
 /**
  * This test runs the examples and checks that they produce the expected output.
  * It takes each input.txt file and runs it as a script, then tests that the
@@ -52,13 +52,14 @@ public class ExamplesIT {
 
   private static final File PROJECT_BASE_DIR =
     new File(System.getProperty("hadoop.book.basedir",
-        "/Users/tom/book-workspace/hadoop-book"));
+        "/home/pkeni/git/hadoop-book"));
   
   private static final String MODE_PROPERTY = "example.mode";
   private static final String MODE_DEFAULT = "local";
   
   private static final String EXAMPLE_CHAPTERS_PROPERTY = "example.chapters";
-  private static final String EXAMPLE_CHAPTERS_DEFAULT = "ch02,ch04,ch04-avro,ch05,ch07,ch08";
+//  private static final String EXAMPLE_CHAPTERS_DEFAULT = "ch02,ch04,ch04-avro,ch05,ch07,ch08";
+  private static final String EXAMPLE_CHAPTERS_DEFAULT = "ch02,ch04,ch05,ch07,ch08";
 
   private static final IOFileFilter HIDDEN_FILE_FILTER =
     new OrFileFilter(HiddenFileFilter.HIDDEN, new PrefixFileFilter("_"));
@@ -88,13 +89,13 @@ public class ExamplesIT {
     return data;
   }
   
-  private File example; // parameter
-  private File actualOutputDir = new File(PROJECT_BASE_DIR, "output");
+  private final File example; // parameter
+  private final File actualOutputDir = new File(PROJECT_BASE_DIR, "output");
   private static Map<String, String> env;
   private static String version;
   private static String mode;
   
-  public ExamplesIT(File example) {
+  public ExamplesIT(final File example) {
     this.example = example;
   }
   
@@ -183,7 +184,7 @@ public class ExamplesIT {
     System.out.println("Completed " + example);
   }
   
-  private File findBaseExampleDirectory(File example) {
+  private File findBaseExampleDirectory(final File example) {
     // Look in base/<version>/<mode> then base/<version> then base/<mode>
     File[] candidates = {
         new File(new File(example, version), mode),
@@ -201,7 +202,7 @@ public class ExamplesIT {
     return example;
   }
 
-  private static String execute(String commandLine) throws ExecuteException, IOException {
+  private static String execute(final String commandLine) throws ExecuteException, IOException {
     ByteArrayOutputStream stdout = new ByteArrayOutputStream();
     PumpStreamHandler psh = new PumpStreamHandler(stdout);
     CommandLine cl = CommandLine.parse("/bin/bash " + commandLine);
@@ -220,13 +221,14 @@ public class ExamplesIT {
     return stdout.toString();
   }
 
-  private File decompress(File file) throws IOException {
+  private File decompress(final File file) throws IOException {
     File decompressed = File.createTempFile(getClass().getSimpleName(), ".txt");
     decompressed.deleteOnExit();
     final GZIPInputStream in = new GZIPInputStream(new FileInputStream(file));
     try {
       Files.copy(new InputSupplier<InputStream>() {
-          public InputStream getInput() throws IOException {
+          @Override
+        public InputStream getInput() throws IOException {
             return in;
           }
       }, decompressed);
