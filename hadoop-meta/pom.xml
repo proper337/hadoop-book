@@ -34,6 +34,7 @@ A module which allows the Hadoop dependencies to be specified by a Maven profile
           <name>hadoop.version</name>
           <value>1.1.1</value>
         </property>
+        <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
         <hadoop.version>1.1.1</hadoop.version>
